@@ -8,7 +8,7 @@ import TodoList from '@/components/TodoList'
 import TodoFilter from '@/components/TodoFilter'
 import TodoForm from '@/components/TodoForm'
 import ThemeSelector from '@/components/ThemeSelector'
-import type { FilterOptions, TodoInsert } from '@/lib/types'
+import type { FilterOptions, TodoInsert, TodoUpdate } from '@/lib/types'
 
 export default function Home() {
   const router = useRouter()
@@ -38,10 +38,11 @@ export default function Home() {
     }
   }, [user, authLoading, router])
 
-  const handleCreateTodo = async (data: TodoInsert) => {
+  const handleCreateTodo = async (data: TodoInsert | TodoUpdate) => {
     setIsSubmitting(true)
     try {
-      await createTodo(data)
+      // In create mode, title is always required, so we can safely cast to TodoInsert
+      await createTodo(data as TodoInsert)
       setShowCreateForm(false)
     } catch (error) {
       console.error('Error creating todo:', error)
