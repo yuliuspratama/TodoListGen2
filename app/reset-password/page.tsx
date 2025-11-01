@@ -3,26 +3,53 @@
 import { Suspense } from 'react'
 import { useState, useEffect } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import ThemeSelector from '@/components/ThemeSelector'
 
 function ResetPasswordForm() {
   const router = useRouter()
-  const searchParams = useSearchParams()
   const [password, setPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
+  const [isValidating, setIsValidating] = useState(true)
 
   useEffect(() => {
-    // Check if there's a valid hash in the URL
-    const hash = searchParams.get('hash')
-    if (!hash) {
-      setError('Link reset password tidak valid atau telah kedaluwarsa.')
+    // Handle hash fragment dari recovery link (misalnya: #access_token=...&type=recovery)
+    const hash = window.location.hash
+    if (hash) {
+      // Extract access_token dari hash fragment
+      const hashParams = new URLSearchParams(hash.substring(1)) // Remove # symbol
+      const accessToken = hashParams.get('access_token')
+      const type = hashParams.get('type')
+      
+      if (accessToken && type === 'recovery') {
+        // Set session dengan access token dari hash
+        supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: hashParams.get('refresh_token') || '',
+        }).then(({ error: sessionError }) => {
+          if (sessionError) {
+            setError('Link reset password tidak valid atau telah kedaluwarsa.')
+          }
+          setIsValidating(false)
+        })
+      } else {
+        setError('Link reset password tidak valid.')
+        setIsValidating(false)
+      }
+    } else {
+      // Cek apakah user sudah login (untuk kasus redirect normal)
+      supabase.auth.getSession().then(({ data: { session }, error: sessionError }) => {
+        if (sessionError || !session) {
+          setError('Link reset password tidak valid atau telah kedaluwarsa.')
+        }
+        setIsValidating(false)
+      })
     }
-  }, [searchParams])
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -58,6 +85,14 @@ function ResetPasswordForm() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (isValidating) {
+    return (
+      <div className="text-center text-text-secondary">
+        <p>Memvalidasi link reset password...</p>
+      </div>
+    )
   }
 
   return (
