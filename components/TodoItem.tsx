@@ -11,9 +11,9 @@ interface TodoItemProps {
 }
 
 const priorityColors: Record<Priority, string> = {
-  low: 'bg-gray-100 text-gray-800 border-gray-300',
-  medium: 'bg-yellow-100 text-yellow-800 border-yellow-300',
-  high: 'bg-red-100 text-red-800 border-red-300',
+  low: 'bg-opacity-20 bg-secondary text-text-secondary border-border',
+  medium: 'bg-opacity-20 bg-warning text-text border-border',
+  high: 'bg-opacity-20 bg-error text-error border-border',
 }
 
 const priorityLabels: Record<Priority, string> = {
@@ -50,12 +50,12 @@ export default function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemP
 
   return (
     <div
-      className={`bg-white rounded-lg shadow p-4 border-l-4 ${
+      className={`bg-surface rounded-lg shadow border-l-4 p-4 border ${
         todo.completed
-          ? 'opacity-60 border-gray-400'
+          ? 'opacity-60 border-border'
           : isOverdue
-          ? 'border-red-500'
-          : 'border-blue-500'
+          ? 'border-error'
+          : 'border-primary'
       } transition-all hover:shadow-md`}
     >
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
@@ -65,11 +65,11 @@ export default function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemP
               type="checkbox"
               checked={todo.completed}
               onChange={(e) => onToggle(todo.id, e.target.checked)}
-              className="w-5 h-5 text-blue-600 rounded focus:ring-blue-500 cursor-pointer flex-shrink-0"
+              className="w-5 h-5 text-primary rounded focus:ring-primary cursor-pointer flex-shrink-0"
             />
             <h3
               className={`font-semibold text-lg flex-1 min-w-0 ${
-                todo.completed ? 'line-through text-gray-500' : 'text-gray-900'
+                todo.completed ? 'line-through text-text-secondary' : 'text-text'
               }`}
             >
               {todo.title}
@@ -82,21 +82,21 @@ export default function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemP
           </div>
 
           {todo.description && (
-            <p className={`text-sm text-gray-600 ml-8 ${todo.completed ? 'line-through' : ''}`}>
+            <p className={`text-sm text-text-secondary ml-8 ${todo.completed ? 'line-through' : ''}`}>
               {todo.description}
             </p>
           )}
 
           <div className="flex flex-wrap items-center gap-4 mt-3 ml-8">
             {todo.category && (
-              <span className="text-xs text-gray-500 bg-gray-100 px-2 py-1 rounded">
+              <span className="text-xs text-text-secondary bg-background px-2 py-1 rounded border border-border">
                 {todo.category}
               </span>
             )}
             {todo.deadline && (
               <span
                 className={`text-xs ${
-                  isOverdue ? 'text-red-600 font-semibold' : 'text-gray-500'
+                  isOverdue ? 'text-error font-semibold' : 'text-text-secondary'
                 }`}
               >
                 📅 {formatDate(todo.deadline)}
@@ -109,14 +109,14 @@ export default function TodoItem({ todo, onToggle, onEdit, onDelete }: TodoItemP
         <div className="flex flex-col sm:flex-row gap-2 mt-2 sm:mt-0">
           <button
             onClick={() => onEdit(todo)}
-            className="px-3 py-1 text-sm text-blue-600 hover:bg-blue-50 rounded transition"
+            className="px-3 py-1 text-sm text-primary hover:bg-primary hover:bg-opacity-10 rounded transition"
             disabled={isDeleting}
           >
             Edit
           </button>
           <button
             onClick={handleDelete}
-            className="px-3 py-1 text-sm text-red-600 hover:bg-red-50 rounded transition"
+            className="px-3 py-1 text-sm text-error hover:bg-error hover:bg-opacity-10 rounded transition"
             disabled={isDeleting}
           >
             {isDeleting ? 'Menghapus...' : 'Hapus'}

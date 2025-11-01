@@ -78,25 +78,25 @@ export default function TodoList({ filterOptions }: TodoListProps) {
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-        <p className="mt-4 text-gray-600">Memuat todos...</p>
+        <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <p className="mt-4 text-text-secondary">Memuat todos...</p>
       </div>
     )
   }
 
   if (error) {
     return (
-      <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-        <p className="font-semibold">Error:</p>
-        <p>{error}</p>
+      <div className="bg-error bg-opacity-10 border-2 border-error px-4 py-3 rounded">
+        <p className="text-error font-semibold">Error:</p>
+        <p className="text-error">{error}</p>
       </div>
     )
   }
 
   if (filteredTodos.length === 0) {
     return (
-      <div className="text-center py-12 bg-white rounded-lg shadow">
-        <p className="text-gray-500 text-lg">
+      <div className="text-center py-12 bg-surface rounded-lg shadow border border-border">
+        <p className="text-text-secondary text-lg">
           {todos.length === 0 ? 'Belum ada todo. Buat todo pertama Anda!' : 'Tidak ada todo yang sesuai dengan filter.'}
         </p>
       </div>
@@ -116,8 +116,8 @@ export default function TodoList({ filterOptions }: TodoListProps) {
       ))}
       {editingTodo && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">Edit Todo</h2>
+          <div className="bg-surface rounded-lg shadow-xl border border-border max-w-md w-full p-6 max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 text-text">Edit Todo</h2>
             <TodoForm
               todo={editingTodo}
               onSubmit={async (data) => {

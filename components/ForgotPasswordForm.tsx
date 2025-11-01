@@ -2,17 +2,10 @@
 
 import { useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
-interface AuthFormProps {
-  mode: 'login' | 'register'
-}
-
-export default function AuthForm({ mode }: AuthFormProps) {
-  const router = useRouter()
+export default function ForgotPasswordForm() {
   const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [message, setMessage] = useState<string | null>(null)
@@ -24,28 +17,16 @@ export default function AuthForm({ mode }: AuthFormProps) {
     setMessage(null)
 
     try {
-      if (mode === 'register') {
-        const { error: signUpError } = await supabase.auth.signUp({
-          email,
-          password,
-        })
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      })
 
-        if (signUpError) throw signUpError
+      if (resetError) throw resetError
 
-        setMessage('Registrasi berhasil! Silakan cek email Anda untuk verifikasi.')
-      } else {
-        const { error: signInError } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        })
-
-        if (signInError) throw signInError
-
-        router.push('/')
-        router.refresh()
-      }
+      setMessage('Link reset password telah dikirim ke email Anda. Silakan cek inbox email Anda.')
+      setEmail('')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Terjadi kesalahan')
+      setError(err instanceof Error ? err.message : 'Terjadi kesalahan saat mengirim email reset')
     } finally {
       setLoading(false)
     }
@@ -82,44 +63,19 @@ export default function AuthForm({ mode }: AuthFormProps) {
         />
       </div>
 
-      <div>
-        <label htmlFor="password" className="block text-sm font-medium text-text mb-1">
-          Password
-        </label>
-        <input
-          id="password"
-          type="password"
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          required
-          minLength={6}
-          className="w-full px-3 py-2 border border-border rounded-md shadow-sm bg-surface text-text focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary"
-          placeholder="Minimal 6 karakter"
-        />
-      </div>
-
-      {mode === 'login' && (
-        <div className="text-right">
-          <Link
-            href="/forgot-password"
-            className="text-sm text-primary hover:opacity-80"
-          >
-            Lupa password?
-          </Link>
-        </div>
-      )}
-
       <button
         type="submit"
         disabled={loading}
         className="w-full bg-primary text-white py-2 px-4 rounded-md hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed transition"
       >
-        {loading
-          ? 'Memproses...'
-          : mode === 'login'
-          ? 'Masuk'
-          : 'Daftar'}
+        {loading ? 'Mengirim...' : 'Kirim Link Reset Password'}
       </button>
+
+      <p className="text-center text-sm text-text-secondary">
+        <Link href="/login" className="text-primary hover:opacity-80">
+          Kembali ke halaman masuk
+        </Link>
+      </p>
     </form>
   )
 }
